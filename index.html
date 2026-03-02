@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تحدي بنائيات البيانات | الأستاذ محمد طه</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root { --primary: #2c3e50; --accent: #e67e22; --success: #27ae60; --error: #e74c3c; --gold: #f1c40f; }
+body { font-family: 'Cairo', sans-serif; background: #f0f3f5; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; user-select: none; }
+#quiz-app { width: 95%; max-width: 800px; background: #fff; border-radius: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.1); overflow: hidden; }
+.header { background: var(--primary); color: white; padding: 20px; text-align: center; }
+#progress-bar-container { background: rgba(255,255,255,0.2); border-radius: 10px; height: 10px; margin-top: 10px; }
+#progress-bar { background: var(--gold); width: 0%; height: 100%; transition: 0.4s; }
+.blackboard { background: #2c3e50; color: #fff; padding: 30px; margin: 20px; border-radius: 15px; text-align: center; font-size: 1.3rem; border-bottom: 5px solid #1a252f; line-height: 1.6;}
+.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+.opt-btn { background: #fff; border: 2px solid #ddd; padding: 18px; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.2s; font-family: 'Cairo'; font-size: 1rem; }
+.opt-btn:hover { border-color: var(--accent); background: #fff9f4; }
+.correct { background: var(--success)!important; color: white; border-color: var(--success); }
+.wrong { background: var(--error)!important; color: white; border-color: var(--error); }
+.explanation-zone { display: none; background: #fdf2e9; margin: 0 20px 20px; padding: 20px; border-radius: 12px; border-right: 5px solid var(--accent); }
+.btn-main { background: var(--accent); color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 1.1rem; cursor: pointer; width: 100%; font-family: 'Cairo'; font-weight: bold; }
+@media (max-width: 600px) { .options-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body oncontextmenu="return false">
+
+<div id="quiz-app">
+    <div id="quiz-screen">
+        <div class="header">
+            <div style="font-size: 1.2rem; margin-bottom: 5px;">🚀 تحدي المبدعين مع الأستاذ محمد طه</div>
+            <span id="score-val" style="float: left;">النقاط: 0</span>
+            <span id="progress">السؤال 1 من 30</span>
+            <div id="progress-bar-container"><div id="progress-bar"></div></div>
+        </div>
+        
+        <div class="blackboard" id="question-text">جاري تحميل التحدي...</div>
+        
+        <div id="options-box" class="options-grid"></div>
+        
+        <div id="explanation-box" class="explanation-zone">
+            <h4 style="margin:0; color:var(--accent);">💡 توضيح للمتدربين:</h4>
+            <p id="step-text" style="margin:5px 0 0;"></p>
+        </div>
+        
+        <div style="padding: 0 20px 20px;">
+            <button id="next-btn" class="btn-main" style="display:none" onclick="loadNext()">أحسنت! استمر يا مبدع ➡️</button>
+        </div>
+    </div>
+
+    <div id="result-screen" style="display:none; padding: 60px; text-align: center;">
+        <h1 style="color: var(--success);">🎊 تهانينا أيها المبدع! 🎊</h1>
+        <div id="final-res" style="font-size: 1.4rem; margin: 25px; line-height: 1.8;"></div>
+        <button class="btn-main" style="background:#25D366; margin-bottom: 10px;" onclick="sendWA()">إرسال النتيجة واتساب 🟢</button>
+        <button class="btn-main" style="background:#7f8c8d" onclick="location.reload()">إعادة التحدي 🔄</button>
+    </div>
+</div>
+
+<script>
+const sndCorrect = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
+const sndWrong = new Audio('https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3');
+
+const quizDB = [
+    { q: "🏗️ أيها المبدع، ما هو العلم الذي ينظم البيانات في الحاسوب بأفضل صورة؟", opts: ["بنائيات البيانات", "هندسة النظم", "الذكاء الاصطناعي"], ans: 0, step: "بنائيات البيانات تمكن المتدربين من تخزين البيانات بأسرع وقت وأقل سعة." },
+    { q: "💾 ما هو عدد الخانات الثنائية (Bits) التي يتكون منها موقع الذاكرة؟", opts: ["البت", "الكلمة (Word)", "البايت"], ans: 1, step: "تسمى الكلمة ويختلف حجمها (16، 32، 64) حسب نوع الحاسوب." },
+    { q: "🔢 أي نوع من البيانات يمثل الأعداد الصحيحة بدون فاصلة؟", opts: ["الأعداد الحقيقية", "البيانات الرقمية (Integer)", "البيانات المنطقية"], ans: 1, step: "الأعداد الصحيحة مثل (5، -10) لا تحتوي على كسور عشرية." },
+    { q: "⚖️ البيانات المنطقية (Boolean) تأخذ قيمتين فقط هما؟", opts: ["0 و 9", "1 و 10", "صواب (1) وخطأ (0)"], ans: 2, step: "تمثل الحالة المنطقية؛ إما تحقق الشرط (1) أو عدم تحققه (0)." },
+    { q: "🚩 في خوارزمية علامة القيمة، ماذا تعني الخانة (1) في اليسار؟", opts: ["العدد موجب", "العدد سالب", "العدد صفر"], ans: 1, step: "الخانة الأخيرة مخصصة للإشارة؛ 0 للموجب و1 للسالب." },
+    { q: "🔄 كيف نحصل على المتمم الأحادي (1's Complement)؟", opts: ["إضافة واحد", "قلب الأصفار والآحاد", "حذف الخانة الأولى"], ans: 1, step: "يتم ذلك بتبديل كل 0 بـ 1 وكل 1 بـ 0 في التمثيل الثنائي." },
+    { q: "⭐ ما الميزة التي تجعل المتمم الثنائي أفضل من علامة القيمة؟", opts: ["أنه أسرع", "أنه يعطي صفراً واحداً فقط", "أنه أسهل"], ans: 1, step: "يعالج مشكلة وجود (+0) و (-0) ويجعل للصفر تمثيلاً واحداً." },
+    { q: "📐 مما يتكون تمثيل العدد الحقيقي داخل الذاكرة؟", opts: ["الكسر (Mantissa) والقوة (Exponent)", "إشارة ورقم فقط", "حروف وأرقام"], ans: 0, step: "يتم تخزينه في جزأين لضمان الدقة والتعامل مع الأرقام الكبيرة." },
+    { q: "🔡 أي نظام ترميز للحروف طورته شركة IBM؟", opts: ["ASCII", "EBCDIC", "Unicode"], ans: 1, step: "نظام إبسيدك هو المعيار المعتمد في أجهزة شركة IBM." },
+    { q: "📋 ما هو البناء البياني الذي يجمع عناصر من أنواع مختلفة؟", opts: ["المصفوفة", "السجل (Record)", "المتغير البسيط"], ans: 1, step: "السجل يجمع حقولاً متنوعة (نصوص، أرقام) لبيان واحد مثل الطالب." },
+    { q: "🧮 ماذا تسمى الأرقام التي تحدد موقع العنصر داخل المصفوفة؟", opts: ["المفاتيح", "المؤشرات (Indexes)", "العناوين"], ans: 1, step: "المؤشر هو الرقم الذي يحدد ترتيب العنصر للوصول إليه." },
+    { q: "🏢 ماذا يسمى عنوان أول موقع تبدأ منه عناصر المصفوفة؟", opts: ["الموقع النهائي", "الموقع الأساسي (Base)", "طول البعد"], ans: 1, step: "هو العنوان المرجعي الذي تنطلق منه حسابات مواقع الذاكرة." },
+    { q: "📊 أيها المبدع، المصفوفة ذات البعدين تشبه في شكلها؟", opts: ["السلسلة", "الجدول (Table)", "الدائرة"], ans: 1, step: "تتكون من صفوف وأعمدة متقاطعة كأنها جدول بيانات." },
+    { q: "📝 في لغة فورتران، ما الذي يحدد نوع المتغير تلقائياً؟", opts: ["طول المتغير", "الحرف الأول من اسمه", "مكان التخزين"], ans: 1, step: "الحروف من I إلى N مخصصة للأعداد الصحيحة تلقائياً." },
+    { q: "⚡ ما ناتج عملية الجمع الثنائي $1 + 1$؟", opts: ["2", "11", "10"], ans: 2, step: "الناتج هو (0) ومعنا (1) محمول للخانة التالية." },
+    { q: "🎯 لماذا نلجأ لعملية 'تطبيع' الكسر في الأعداد الحقيقية؟", opts: ["للتجميل", "لزيادة الدقة في التمثيل", "للتصغير"], ans: 1, step: "لضمان بقاء الأرقام المعنوية في الكسر وتحسين دقة الحسابات." },
+    { q: "🧩 أيها البطل، ميزات المصفوفة أن عناصرها من نوع...؟", opts: ["واحد فقط", "أنواع مختلفة", "حروف فقط"], ans: 0, step: "المصفوفة بناء متجانس، يجب أن تكون كل عناصرها من نفس النوع." },
+    { q: "🔍 أي نظام ترميز يدعم كل لغات العالم بما فيها العربية؟", opts: ["ASCII", "Unicode", "EBCDIC"], ans: 1, step: "اليونيكود هو النظام العالمي الموحد لجميع اللغات والرموز." },
+    { q: "📏 كيف يتم حساب طول المصفوفة (عدد العناصر)؟", opts: ["البداية + النهاية", "الأعلى - الأدنى + 1", "الضرب في 2"], ans: 1, step: "نطرح مؤشر الحد الأدنى من الأعلى ونضيف 1 للحصول على العدد." },
+    { q: "💻 ما هي أصغر وحدة تخزين معلومات في الحاسوب؟", opts: ["البايت", "البت (Bit)", "الميجا"], ans: 1, step: "البت هو الوحدة الأساسية التي تأخذ قيمة نبضة (1) أو سكون (0)." },
+    { q: "🔀 ما ناتج العملية الثنائية $10 - 1$؟", opts: ["0", "1", "11"], ans: 1, step: "الرقم 10 بالثنائي هو 2 بالعشري، لذا $2-1 = 1$." },
+    { q: "🛠️ متى يقوم المترجم (Compiler) بحجز مساحة المصفوفة؟", opts: ["أثناء التنفيذ", "عند تعريف المصفوفة", "بعد إغلاق البرنامج"], ans: 1, step: "يتم حجز المساحة بمجرد إعلان المبرمج عن نوع وحجم المصفوفة." },
+    { q: "📂 العناصر المكونة للسجل (Record) تسمى؟", opts: ["صفوفاً", "حقولاً (Fields)", "مفاتيح"], ans: 1, step: "كل حقل في السجل يحمل معلومة محددة عن الكيان." },
+    { q: "💡 أيها الذكي، ناتج $1+1+1$ بالنظام الثنائي هو؟", opts: ["11", "101", "10"], ans: 0, step: "يساوي 3 بالعشري، وتمثيلها في النظام الثنائي هو 11." },
+    { q: "🏔️ ماذا يمثل 'الحد الأعلى' في المصفوفة؟", opts: ["أكبر قيمة عنصر", "أكبر رقم للمؤشر", "أول عنوان"], ans: 1, step: "هو الرقم الأقصى الذي يمكن أن يصل إليه مؤشر المصفوفة." },
+    { q: "💎 لماذا يفضل استخدام المتمم الثنائي في العمليات الحسابية؟", opts: ["لأنه أحدث", "لتبسيط الدوائر المنطقية", "لأنه أسهل للمبرمج"], ans: 1, step: "لأنه يسمح بإجراء عملية الطرح باستخدام دارة الجمع نفسها." },
+    { q: "📱 كم عدداً من 'البتات' يحتوي عليه البايت الواحد؟", opts: ["4", "8", "16"], ans: 1, step: "البايت القياسي يتكون دائماً من 8 بتات متجاورة." },
+    { q: "🖋️ البيانات الحرفية تخزن في الذاكرة على شكل؟", opts: ["صور مصغرة", "أكواد رقمية ثنائية", "إشارات صوتية"], ans: 1, step: "يتم تحويل كل رمز إلى كود (مثل 65 للحرف A) ثم لثنائي." },
+    { q: "🔗 للوصول لحقل معين داخل السجل نستخدم؟", opts: ["المؤشر الرقمي", "اسم الحقل", "عنوان الذاكرة"], ans: 1, step: "يتم الوصول عبر كتابة (اسم_السجل . اسم_الحقل)." },
+    { q: "🏆 أيها المبدع، ما هو الهدف الأساسي من دراسة بنائيات البيانات؟", opts: ["تحسين كفاءة البرامج", "تعلم الطباعة", "إصلاح الشاشات"], ans: 0, step: "تهدف لتمكين المتدربين من كتابة برامج سريعة وموفرة للذاكرة." }
+];
+
+let current = 0, score = 0;
+
+function loadNext() {
+    current++;
+    if(current < quizDB.length) {
+        loadQuestion();
+    } else {
+        showResult();
+    }
+}
+
+function loadQuestion() {
+    const data = quizDB[current];
+    document.getElementById("question-text").innerText = data.q;
+    document.getElementById("progress").innerText = `السؤال ${current+1} من ${quizDB.length}`;
+    document.getElementById("progress-bar").style.width = `${((current+1)/quizDB.length)*100}%`;
+    
+    const box = document.getElementById("options-box");
+    box.innerHTML = "";
+    data.opts.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.className = "opt-btn";
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(i, btn);
+        box.appendChild(btn);
+    });
+    document.getElementById("explanation-box").style.display = "none";
+    document.getElementById("next-btn").style.display = "none";
+}
+
+function checkAnswer(idx, btn) {
+    const correctIdx = quizDB[current].ans;
+    const allBtns = document.querySelectorAll(".opt-btn");
+    allBtns.forEach(b => b.disabled = true);
+
+    if(idx === correctIdx) {
+        btn.classList.add("correct");
+        score += 10;
+        sndCorrect.play();
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+    } else {
+        btn.classList.add("wrong");
+        allBtns[correctIdx].classList.add("correct");
+        sndWrong.play();
+    }
+
+    document.getElementById("step-text").innerText = quizDB[current].step;
+    document.getElementById("explanation-box").style.display = "block";
+    document.getElementById("next-btn").style.display = "block";
+    document.getElementById("score-val").innerText = `النقاط: ${score}`;
+}
+
+function showResult() {
+    document.getElementById("quiz-screen").style.display = "none";
+    document.getElementById("result-screen").style.display = "block";
+    const total = quizDB.length * 10;
+    const percent = (score / total) * 100;
+    document.getElementById("final-res").innerHTML = `
+        لقد حصلت على <b>${score}</b> من <b>${total}</b><br>
+        نسبة الإنجاز: <b>${percent}%</b><br>
+        أنت رائع حقاً يا بطل البنائيات! 🌟
+    `;
+}
+
+function sendWA() {
+    const msg = `الأستاذ محمد طه، لقد أتممت تحدي بنائيات البيانات بنجاح!\nالنقاط: ${score} من ${quizDB.length * 10}\nالتاريخ: ${new Date().toLocaleDateString()}`;
+    window.open(`https://wa.me/249901946410?text=${encodeURIComponent(msg)}`);
+}
+
+loadQuestion();
+</script>
+</body>
+</html>
