@@ -1,169 +1,162 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تحدي بنائيات البيانات | الأستاذ محمد طه</title>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-<style>
-:root { --primary: #2c3e50; --accent: #e67e22; --success: #27ae60; --error: #e74c3c; --gold: #f1c40f; }
-body { font-family: 'Cairo', sans-serif; background: #f0f3f5; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; user-select: none; }
-#quiz-app { width: 95%; max-width: 800px; background: #fff; border-radius: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.1); overflow: hidden; }
-.header { background: var(--primary); color: white; padding: 20px; text-align: center; }
-#progress-bar-container { background: rgba(255,255,255,0.2); border-radius: 10px; height: 10px; margin-top: 10px; }
-#progress-bar { background: var(--gold); width: 0%; height: 100%; transition: 0.4s; }
-.blackboard { background: #2c3e50; color: #fff; padding: 30px; margin: 20px; border-radius: 15px; text-align: center; font-size: 1.3rem; border-bottom: 5px solid #1a252f; line-height: 1.6;}
-.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
-.opt-btn { background: #fff; border: 2px solid #ddd; padding: 18px; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.2s; font-family: 'Cairo'; font-size: 1rem; }
-.opt-btn:hover { border-color: var(--accent); background: #fff9f4; }
-.correct { background: var(--success)!important; color: white; border-color: var(--success); }
-.wrong { background: var(--error)!important; color: white; border-color: var(--error); }
-.explanation-zone { display: none; background: #fdf2e9; margin: 0 20px 20px; padding: 20px; border-radius: 12px; border-right: 5px solid var(--accent); }
-.btn-main { background: var(--accent); color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 1.1rem; cursor: pointer; width: 100%; font-family: 'Cairo'; font-weight: bold; }
-@media (max-width: 600px) { .options-grid { grid-template-columns: 1fr; } }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحدي محمد طه التفاعلي 2059</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root { --neon-cyan: #00f2ff; --neon-green: #39ff14; --neon-red: #ff3131; --bg: #050a14; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; overflow-x: hidden; }
+        .container { max-width: 900px; margin: auto; background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); padding: 30px; border-radius: 25px; border: 1px solid var(--neon-cyan); box-shadow: 0 0 30px rgba(0,242,255,0.1); }
+        h1 { text-align: center; font-family: 'Orbitron', sans-serif; color: var(--neon-cyan); text-shadow: 0 0 15px var(--neon-cyan); }
+        .status-bar { display: flex; justify-content: space-between; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 15px; margin-bottom: 25px; border-bottom: 2px solid var(--neon-cyan); }
+        .question-box { animation: fadeIn 0.5s ease; }
+        .q-text { font-size: 22px; margin-bottom: 25px; line-height: 1.6; }
+        .options { display: grid; gap: 15px; }
+        .opt-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 18px; border-radius: 12px; cursor: pointer; transition: 0.3s; text-align: right; font-size: 18px; }
+        .opt-btn:hover { background: rgba(0, 242, 255, 0.1); border-color: var(--neon-cyan); transform: scale(1.02); }
+        .feedback { display: none; margin-top: 25px; padding: 20px; border-radius: 15px; animation: slideUp 0.4s ease; border-right: 8px solid; }
+        .correct-bg { background: rgba(57, 255, 20, 0.1); border-color: var(--neon-green); color: var(--neon-green); }
+        .wrong-bg { background: rgba(255, 49, 49, 0.1); border-color: var(--neon-red); color: #ff9999; }
+        .explanation { color: #ddd; margin-top: 10px; font-size: 16px; line-height: 1.6; }
+        .steps { color: var(--neon-cyan); font-weight: bold; font-size: 14px; margin-top: 10px; }
+        .next-btn { width: 100%; padding: 15px; background: var(--neon-cyan); color: black; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 20px; display: none; font-size: 18px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
-<body oncontextmenu="return false">
+<body>
 
-<div id="quiz-app">
-    <div id="quiz-screen">
-        <div class="header">
-            <div style="font-size: 1.2rem; margin-bottom: 5px;">🚀 تحدي المبدعين مع الأستاذ محمد طه</div>
-            <span id="score-val" style="float: left;">النقاط: 0</span>
-            <span id="progress">السؤال 1 من 30</span>
-            <div id="progress-bar-container"><div id="progress-bar"></div></div>
+<div class="container">
+    <h1>PASCAL CORE 2059</h1>
+    <div class="status-bar">
+        <div>المتدرب: <span style="color:var(--neon-cyan)">تحت الاختبار</span></div>
+        <div>التقدم: <span id="qIdx">1</span> / 30</div>
+        <div>الدرجة: <span id="score">0</span></div>
+    </div>
+
+    <div id="quiz-area">
+        <div class="question-box">
+            <div class="q-text" id="qText">جاري استدعاء البيانات...</div>
+            <div class="options" id="options"></div>
         </div>
-        
-        <div class="blackboard" id="question-text">جاري تحميل التحدي...</div>
-        
-        <div id="options-box" class="options-grid"></div>
-        
-        <div id="explanation-box" class="explanation-zone">
-            <h4 style="margin:0; color:var(--accent);">💡 توضيح للمتدربين:</h4>
-            <p id="step-text" style="margin:5px 0 0;"></p>
-        </div>
-        
-        <div style="padding: 0 20px 20px;">
-            <button id="next-btn" class="btn-main" style="display:none" onclick="loadNext()">أحسنت! استمر يا مبدع ➡️</button>
+        <div id="feedback" class="feedback">
+            <div id="fb-title" style="font-weight: bold; font-size: 20px;"></div>
+            <div id="fb-desc" class="explanation"></div>
+            <div id="fb-steps" class="steps"></div>
+            <button class="next-btn" id="nextBtn" onclick="nextQ()">انتقال للسؤال التالي ⮕</button>
         </div>
     </div>
 
-    <div id="result-screen" style="display:none; padding: 60px; text-align: center;">
-        <h1 style="color: var(--success);">🎊 تهانينا أيها المبدع! 🎊</h1>
-        <div id="final-res" style="font-size: 1.4rem; margin: 25px; line-height: 1.8;"></div>
-        <button class="btn-main" style="background:#25D366; margin-bottom: 10px;" onclick="sendWA()">إرسال النتيجة واتساب 🟢</button>
-        <button class="btn-main" style="background:#7f8c8d" onclick="location.reload()">إعادة التحدي 🔄</button>
+    <div id="final-screen" style="display:none; text-align:center;">
+        <h2 id="final-msg"></h2>
+        <div id="final-score" style="font-size:40px; color:var(--neon-cyan); margin: 20px 0;"></div>
+        <button class="opt-btn" style="width:100%" onclick="location.reload()">إعادة التحدي</button>
+        <button class="opt-btn" style="width:100%; margin-top:10px; background:var(--neon-green); color:black;" onclick="sendWA()">إرسال التقرير للأستاذ محمد طه</button>
     </div>
 </div>
 
+<audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+<audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
+
 <script>
-const sndCorrect = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
-const sndWrong = new Audio('https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3');
+    const quizData = [
+        {q: "ما الدالة التي تحول 'رقم الرمز' إلى 'الحرف'؟", a: ["ord(c)", "chr(i)", "abs(x)"], c: 1, exp: "الدالة chr تحول الكود الرقمي للحرف (ASCII).", step: "الخطوة: إدخال رقم -> معالجة كود الرمز -> إخراج الحرف."},
+        {q: "نتيجة العملية 10 MOD 3 هي:", a: ["3", "1", "0"], c: 1, exp: "MOD تعطي باقي القسمة. 10 تقسيم 3 يساوي 3 والباقي 1.", step: "الخطوة: قسمة 10 على 3 -> تحديد الباقي الصحيح -> الناتج 1."},
+        {q: "أي دالة تعطينا القيمة المطلقة؟", a: ["sqrt(x)", "abs(x)", "sqr(x)"], c: 1, exp: "Abs تجرد العدد من إشارته السالبة.", step: "الخطوة: استقبال عدد -> حذف الإشارة -> ناتج موجب."},
+        {q: "المعالج المنطقي AND يعطي True إذا كان:", a: ["كلا الشرطين True", "أحد الشرطين True", "كلا الشرطين False"], c: 0, exp: "AND تتطلب تحقق جميع الشروط معاً.", step: "الخطوة: فحص أ + فحص ب -> إذا الكل محقق -> النتيجة True."},
+        {q: "للتعبير عن 'لا يساوي' نستخدم:", a: ["!=", "==", "<>"], c: 2, exp: "باسكال تستخدم الأقواس المتقابلة للاختلاف.", step: "الخطوة: مقارنة القيمتين -> إذا اختلفا -> النتيجة True."},
+        {q: "ما وظيفة الدالة Sqr(x)؟", a: ["الجذر التربيعي", "مربع العدد", "تقريب العدد"], c: 1, exp: "Sqr تضرب العدد في نفسه.", step: "الخطوة: س * س = النتيجة."},
+        {q: "عند تنفيذ ReadLn(x)، المؤشر ينتقل إلى:", a: ["بداية الملف", "سطر جديد", "نفس السطر"], c: 1, exp: "Ln تعني القفز لسطر جديد بعد القراءة.", step: "الخطوة: قراءة القيمة -> ضغط Enter آلياً -> سطر جديد."},
+        {q: "الدالة Odd(x) تختبر هل العدد:", a: ["زوجي", "فردي", "أولي"], c: 1, exp: "Odd ترجع True إذا كان العدد فردياً.", step: "الخطوة: فحص باقي القسمة على 2 -> إذا وجد باقي -> فردي."},
+        {q: "لتحويل حرف صغير لـ كبير نستخدم:", a: ["UpCase", "LowCase", "Round"], c: 0, exp: "UpCase ترفع حالة الحرف.", step: "الخطوة: استقبال حرف -> تغيير كود ASCII -> حرف كبير."},
+        {q: "الدالة Trunc(5.8) تعطي النتيجة:", a: ["6", "5", "0.8"], c: 1, exp: "Trunc تحذف الكسر تماماً دون تقريب.", step: "الخطوة: تحديد العدد الحقيقي -> حذف ما بعد الفاصلة -> عدد صحيح."},
+        {q: "أي نوع بيانات يستوعب القيم (True, False)؟", a: ["Integer", "Boolean", "Char"], c: 1, exp: "البوليان هو النوع المنطقي.", step: "الخطوة: تخزين حالة شرطية فقط."},
+        {q: "الكلمة المحجوزة لبدء قسم المتغيرات هي:", a: ["Const", "Begin", "Var"], c: 2, exp: "Var هي اختصار لـ Variables.", step: "الخطوة: حجز مساحة في الذاكرة RAM."},
+        {q: "الدالة Round(4.6) تعطي النتيجة:", a: ["4", "5", "4.6"], c: 1, exp: "Round تقرب لأقرب عدد صحيح.", step: "الخطوة: فحص الكسر -> إذا >= 0.5 زِد 1."},
+        {q: "المعالج DIV يعطي:", a: ["باقي القسمة", "الناتج الصحيح للقسمة", "القسمة الحقيقية"], c: 1, exp: "DIV تشطب الكسر وتعطي الرقم الصحيح.", step: "الخطوة: قسمة -> حذف الفواصل -> الناتج."},
+        {q: "ما هو رمز التخصيص (الإسناد)؟", a: ["=", "==", ":="], c: 2, exp: "النقاط الرأسية مع اليساوي للإسناد.", step: "الخطوة: خذ القيمة من اليمين -> ضعها في اليسار."},
+        {q: "الدالة Sqrt(25) نتيجتها هي:", a: ["5", "625", "10"], c: 0, exp: "Sqrt تعطي الجذر التربيعي.", step: "الخطوة: ما العدد الذي مربعه 25؟ -> الناتج 5."},
+        {q: "ما هو الحد الأقصى لنوع Byte؟", a: ["127", "255", "32767"], c: 1, exp: "البايت يخزن من 0 إلى 255.", step: "الخطوة: تخزين أرقام صغيرة موجبة فقط."},
+        {q: "لتعريف مصفوفة (Array) نستخدم القوس:", a: ["( )", "[ ]", "{ }"], c: 1, exp: "الأقواس المربعة لتعريف المدى.", step: "الخطوة: تحديد البداية والنهاية [1..10]."},
+        {q: "المعالج المنطقي OR يعطي True إذا:", a: ["كلا الشرطين True", "أحد الشرطين True", "الشرط الأول False"], c: 1, exp: "OR يكتفي بتحقق شرط واحد فقط.", step: "الخطوة: فحص الخيارات -> إذا وجد صح واحد -> الكل صح."},
+        {q: "الكلمة التي ينتهي بها البرنامج تماماً:", a: ["End;", "End.", "Halt;"], c: 1, exp: "النقطة بعد End تعني نهاية الكود المصدري.", step: "الخطوة: إغلاق وحدة المعالجة."},
+        {q: "أي دالة تعطي رتبة الحرف في ASCII؟", a: ["chr", "ord", "abs"], c: 1, exp: "ord تعني Order (رتبة).", step: "الخطوة: حرف -> معالجة -> رقم الرتبة."},
+        {q: "نوع البيانات للحروف هو:", a: ["String", "Char", "Real"], c: 1, exp: "Char اختصار لـ Character (حرف واحد).", step: "الخطوة: تخزين رمز واحد فقط."},
+        {q: "لإزاحة النص لسطر جديد في الطباعة:", a: ["Write", "WriteLn", "Read"], c: 1, exp: "Ln تعني سطر جديد (Line).", step: "الخطوة: طباعة النص -> قفز لسطر جديد."},
+        {q: "نتيجة العملية 15 DIV 4 هي:", a: ["3", "3.75", "4"], c: 0, exp: "DIV تأخذ الجزء الصحيح فقط.", step: "الخطوة: 15 / 4 = 3.75 -> حذف 0.75 -> الناتج 3."},
+        {q: "الدالة Frac(5.2) تعطي:", a: ["5", "0.2", "5.2"], c: 1, exp: "Frac تعطي الجزء الكسري فقط.", step: "الخطوة: عدد حقيقي -> حذف الصحيح -> الباقي كسر."},
+        {q: "المتغير من نوع Integer يستغرق:", a: ["1 بايت", "2 بايت", "4 بايت"], c: 1, exp: "العدد الصحيح التقليدي يحجز 16 بت.", step: "الخطوة: تخصيص مساحة في الذاكرة."},
+        {q: "جملة Case تستخدم لـ:", a: ["التكرار", "الاختيار المتعدد", "تعريف المتغيرات"], c: 1, exp: "Case بديل ذكي لـ If المتعددة.", step: "الخطوة: فحص القيمة -> الذهاب للخيار المطابق."},
+        {q: "في حلقة For، الكلمة التي تلي To هي:", a: ["Do", "Then", "Begin"], c: 0, exp: "For ... To ... Do.", step: "الخطوة: عداد -> مدى -> تنفيذ فعل."},
+        {q: "الدالة Int(7.8) تعطي النتيجة:", a: ["8", "7.0", "7"], c: 1, exp: "Int تعيد الجزء الصحيح كنوع Real (7.0).", step: "الخطوة: تحويل العدد الحقيقي لصحيح بتنسيق حقيقي."},
+        {q: "ما رمز التعليق (Comments) في باسكال؟", a: ["//", "{ }", "/* */"], c: 1, exp: "الأقواس المتعرجة للتعليقات.", step: "الخطوة: تجاهل النص أثناء الترجمة."}
+    ];
 
-const quizDB = [
-    { q: "🏗️ أيها المبدع، ما هو العلم الذي ينظم البيانات في الحاسوب بأفضل صورة؟", opts: ["بنائيات البيانات", "هندسة النظم", "الذكاء الاصطناعي"], ans: 0, step: "بنائيات البيانات تمكن المتدربين من تخزين البيانات بأسرع وقت وأقل سعة." },
-    { q: "💾 ما هو عدد الخانات الثنائية (Bits) التي يتكون منها موقع الذاكرة؟", opts: ["البت", "الكلمة (Word)", "البايت"], ans: 1, step: "تسمى الكلمة ويختلف حجمها (16، 32، 64) حسب نوع الحاسوب." },
-    { q: "🔢 أي نوع من البيانات يمثل الأعداد الصحيحة بدون فاصلة؟", opts: ["الأعداد الحقيقية", "البيانات الرقمية (Integer)", "البيانات المنطقية"], ans: 1, step: "الأعداد الصحيحة مثل (5، -10) لا تحتوي على كسور عشرية." },
-    { q: "⚖️ البيانات المنطقية (Boolean) تأخذ قيمتين فقط هما؟", opts: ["0 و 9", "1 و 10", "صواب (1) وخطأ (0)"], ans: 2, step: "تمثل الحالة المنطقية؛ إما تحقق الشرط (1) أو عدم تحققه (0)." },
-    { q: "🚩 في خوارزمية علامة القيمة، ماذا تعني الخانة (1) في اليسار؟", opts: ["العدد موجب", "العدد سالب", "العدد صفر"], ans: 1, step: "الخانة الأخيرة مخصصة للإشارة؛ 0 للموجب و1 للسالب." },
-    { q: "🔄 كيف نحصل على المتمم الأحادي (1's Complement)؟", opts: ["إضافة واحد", "قلب الأصفار والآحاد", "حذف الخانة الأولى"], ans: 1, step: "يتم ذلك بتبديل كل 0 بـ 1 وكل 1 بـ 0 في التمثيل الثنائي." },
-    { q: "⭐ ما الميزة التي تجعل المتمم الثنائي أفضل من علامة القيمة؟", opts: ["أنه أسرع", "أنه يعطي صفراً واحداً فقط", "أنه أسهل"], ans: 1, step: "يعالج مشكلة وجود (+0) و (-0) ويجعل للصفر تمثيلاً واحداً." },
-    { q: "📐 مما يتكون تمثيل العدد الحقيقي داخل الذاكرة؟", opts: ["الكسر (Mantissa) والقوة (Exponent)", "إشارة ورقم فقط", "حروف وأرقام"], ans: 0, step: "يتم تخزينه في جزأين لضمان الدقة والتعامل مع الأرقام الكبيرة." },
-    { q: "🔡 أي نظام ترميز للحروف طورته شركة IBM؟", opts: ["ASCII", "EBCDIC", "Unicode"], ans: 1, step: "نظام إبسيدك هو المعيار المعتمد في أجهزة شركة IBM." },
-    { q: "📋 ما هو البناء البياني الذي يجمع عناصر من أنواع مختلفة؟", opts: ["المصفوفة", "السجل (Record)", "المتغير البسيط"], ans: 1, step: "السجل يجمع حقولاً متنوعة (نصوص، أرقام) لبيان واحد مثل الطالب." },
-    { q: "🧮 ماذا تسمى الأرقام التي تحدد موقع العنصر داخل المصفوفة؟", opts: ["المفاتيح", "المؤشرات (Indexes)", "العناوين"], ans: 1, step: "المؤشر هو الرقم الذي يحدد ترتيب العنصر للوصول إليه." },
-    { q: "🏢 ماذا يسمى عنوان أول موقع تبدأ منه عناصر المصفوفة؟", opts: ["الموقع النهائي", "الموقع الأساسي (Base)", "طول البعد"], ans: 1, step: "هو العنوان المرجعي الذي تنطلق منه حسابات مواقع الذاكرة." },
-    { q: "📊 أيها المبدع، المصفوفة ذات البعدين تشبه في شكلها؟", opts: ["السلسلة", "الجدول (Table)", "الدائرة"], ans: 1, step: "تتكون من صفوف وأعمدة متقاطعة كأنها جدول بيانات." },
-    { q: "📝 في لغة فورتران، ما الذي يحدد نوع المتغير تلقائياً؟", opts: ["طول المتغير", "الحرف الأول من اسمه", "مكان التخزين"], ans: 1, step: "الحروف من I إلى N مخصصة للأعداد الصحيحة تلقائياً." },
-    { q: "⚡ ما ناتج عملية الجمع الثنائي $1 + 1$؟", opts: ["2", "11", "10"], ans: 2, step: "الناتج هو (0) ومعنا (1) محمول للخانة التالية." },
-    { q: "🎯 لماذا نلجأ لعملية 'تطبيع' الكسر في الأعداد الحقيقية؟", opts: ["للتجميل", "لزيادة الدقة في التمثيل", "للتصغير"], ans: 1, step: "لضمان بقاء الأرقام المعنوية في الكسر وتحسين دقة الحسابات." },
-    { q: "🧩 أيها البطل، ميزات المصفوفة أن عناصرها من نوع...؟", opts: ["واحد فقط", "أنواع مختلفة", "حروف فقط"], ans: 0, step: "المصفوفة بناء متجانس، يجب أن تكون كل عناصرها من نفس النوع." },
-    { q: "🔍 أي نظام ترميز يدعم كل لغات العالم بما فيها العربية؟", opts: ["ASCII", "Unicode", "EBCDIC"], ans: 1, step: "اليونيكود هو النظام العالمي الموحد لجميع اللغات والرموز." },
-    { q: "📏 كيف يتم حساب طول المصفوفة (عدد العناصر)؟", opts: ["البداية + النهاية", "الأعلى - الأدنى + 1", "الضرب في 2"], ans: 1, step: "نطرح مؤشر الحد الأدنى من الأعلى ونضيف 1 للحصول على العدد." },
-    { q: "💻 ما هي أصغر وحدة تخزين معلومات في الحاسوب؟", opts: ["البايت", "البت (Bit)", "الميجا"], ans: 1, step: "البت هو الوحدة الأساسية التي تأخذ قيمة نبضة (1) أو سكون (0)." },
-    { q: "🔀 ما ناتج العملية الثنائية $10 - 1$؟", opts: ["0", "1", "11"], ans: 1, step: "الرقم 10 بالثنائي هو 2 بالعشري، لذا $2-1 = 1$." },
-    { q: "🛠️ متى يقوم المترجم (Compiler) بحجز مساحة المصفوفة؟", opts: ["أثناء التنفيذ", "عند تعريف المصفوفة", "بعد إغلاق البرنامج"], ans: 1, step: "يتم حجز المساحة بمجرد إعلان المبرمج عن نوع وحجم المصفوفة." },
-    { q: "📂 العناصر المكونة للسجل (Record) تسمى؟", opts: ["صفوفاً", "حقولاً (Fields)", "مفاتيح"], ans: 1, step: "كل حقل في السجل يحمل معلومة محددة عن الكيان." },
-    { q: "💡 أيها الذكي، ناتج $1+1+1$ بالنظام الثنائي هو؟", opts: ["11", "101", "10"], ans: 0, step: "يساوي 3 بالعشري، وتمثيلها في النظام الثنائي هو 11." },
-    { q: "🏔️ ماذا يمثل 'الحد الأعلى' في المصفوفة؟", opts: ["أكبر قيمة عنصر", "أكبر رقم للمؤشر", "أول عنوان"], ans: 1, step: "هو الرقم الأقصى الذي يمكن أن يصل إليه مؤشر المصفوفة." },
-    { q: "💎 لماذا يفضل استخدام المتمم الثنائي في العمليات الحسابية؟", opts: ["لأنه أحدث", "لتبسيط الدوائر المنطقية", "لأنه أسهل للمبرمج"], ans: 1, step: "لأنه يسمح بإجراء عملية الطرح باستخدام دارة الجمع نفسها." },
-    { q: "📱 كم عدداً من 'البتات' يحتوي عليه البايت الواحد؟", opts: ["4", "8", "16"], ans: 1, step: "البايت القياسي يتكون دائماً من 8 بتات متجاورة." },
-    { q: "🖋️ البيانات الحرفية تخزن في الذاكرة على شكل؟", opts: ["صور مصغرة", "أكواد رقمية ثنائية", "إشارات صوتية"], ans: 1, step: "يتم تحويل كل رمز إلى كود (مثل 65 للحرف A) ثم لثنائي." },
-    { q: "🔗 للوصول لحقل معين داخل السجل نستخدم؟", opts: ["المؤشر الرقمي", "اسم الحقل", "عنوان الذاكرة"], ans: 1, step: "يتم الوصول عبر كتابة (اسم_السجل . اسم_الحقل)." },
-    { q: "🏆 أيها المبدع، ما هو الهدف الأساسي من دراسة بنائيات البيانات؟", opts: ["تحسين كفاءة البرامج", "تعلم الطباعة", "إصلاح الشاشات"], ans: 0, step: "تهدف لتمكين المتدربين من كتابة برامج سريعة وموفرة للذاكرة." }
-];
+    let currentQ = 0, score = 0;
 
-let current = 0, score = 0;
-
-function loadNext() {
-    current++;
-    if(current < quizDB.length) {
-        loadQuestion();
-    } else {
-        showResult();
-    }
-}
-
-function loadQuestion() {
-    const data = quizDB[current];
-    document.getElementById("question-text").innerText = data.q;
-    document.getElementById("progress").innerText = `السؤال ${current+1} من ${quizDB.length}`;
-    document.getElementById("progress-bar").style.width = `${((current+1)/quizDB.length)*100}%`;
-    
-    const box = document.getElementById("options-box");
-    box.innerHTML = "";
-    data.opts.forEach((opt, i) => {
-        const btn = document.createElement("button");
-        btn.className = "opt-btn";
-        btn.innerText = opt;
-        btn.onclick = () => checkAnswer(i, btn);
-        box.appendChild(btn);
-    });
-    document.getElementById("explanation-box").style.display = "none";
-    document.getElementById("next-btn").style.display = "none";
-}
-
-function checkAnswer(idx, btn) {
-    const correctIdx = quizDB[current].ans;
-    const allBtns = document.querySelectorAll(".opt-btn");
-    allBtns.forEach(b => b.disabled = true);
-
-    if(idx === correctIdx) {
-        btn.classList.add("correct");
-        score += 10;
-        sndCorrect.play();
-        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-    } else {
-        btn.classList.add("wrong");
-        allBtns[correctIdx].classList.add("correct");
-        sndWrong.play();
+    function loadQ() {
+        const q = quizData[currentQ];
+        document.getElementById('qText').innerText = q.q;
+        document.getElementById('qIdx').innerText = currentQ + 1;
+        const opts = document.getElementById('options');
+        opts.innerHTML = '';
+        q.a.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerText = opt;
+            btn.onclick = () => check(i);
+            opts.appendChild(btn);
+        });
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'none';
     }
 
-    document.getElementById("step-text").innerText = quizDB[current].step;
-    document.getElementById("explanation-box").style.display = "block";
-    document.getElementById("next-btn").style.display = "block";
-    document.getElementById("score-val").innerText = `النقاط: ${score}`;
-}
+    function check(picked) {
+        const q = quizData[currentQ];
+        const fb = document.getElementById('feedback');
+        const btns = document.querySelectorAll('.opt-btn');
+        btns.forEach(b => b.disabled = true);
+        fb.style.display = 'block';
 
-function showResult() {
-    document.getElementById("quiz-screen").style.display = "none";
-    document.getElementById("result-screen").style.display = "block";
-    const total = quizDB.length * 10;
-    const percent = (score / total) * 100;
-    document.getElementById("final-res").innerHTML = `
-        لقد حصلت على <b>${score}</b> من <b>${total}</b><br>
-        نسبة الإنجاز: <b>${percent}%</b><br>
-        أنت رائع حقاً يا بطل البنائيات! 🌟
-    `;
-}
+        if(picked === q.c) {
+            score++;
+            document.getElementById('snd-correct').play();
+            fb.className = 'feedback correct-bg';
+            document.getElementById('fb-title').innerText = "✅ أحسنت! إجابة صحيحة";
+        } else {
+            document.getElementById('snd-wrong').play();
+            fb.className = 'feedback wrong-bg';
+            document.getElementById('fb-title').innerText = "❌ انتبه! الإجابة الصحيحة: " + q.a[q.c];
+        }
 
-function sendWA() {
-    const msg = `الأستاذ محمد طه، لقد أتممت تحدي بنائيات البيانات بنجاح!\nالنقاط: ${score} من ${quizDB.length * 10}\nالتاريخ: ${new Date().toLocaleDateString()}`;
-    window.open(`https://wa.me/249901946410?text=${encodeURIComponent(msg)}`);
-}
+        document.getElementById('fb-desc').innerText = q.exp;
+        document.getElementById('fb-steps').innerText = q.step;
+        document.getElementById('score').innerText = score;
+        document.getElementById('nextBtn').style.display = 'block';
+    }
 
-loadQuestion();
+    function nextQ() {
+        currentQ++;
+        if(currentQ < quizData.length) loadQ();
+        else showFinal();
+    }
+
+    function showFinal() {
+        document.getElementById('quiz-area').style.display = 'none';
+        const screen = document.getElementById('final-screen');
+        screen.style.display = 'block';
+        document.getElementById('final-msg').innerText = score >= 15 ? "تهانينا أيها المتدرب المتميز!" : "محاولة جيدة، ننصح بمراجعة المفاهيم.";
+        document.getElementById('final-score').innerText = `${score} / 30`;
+    }
+
+    function sendWA() {
+        const msg = `*تقرير أداء المتدرب - منصة 2059*%0Aتم إنهاء تحدي الـ 30 سؤالاً.%0Aالنتيجة النهائية: ${score} من 30 ✅`;
+        window.open(`https://wa.me/249901946410?text=${msg}`);
+    }
+
+    window.onload = loadQ;
 </script>
 </body>
 </html>
